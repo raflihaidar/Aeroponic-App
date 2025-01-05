@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { useSensorStore } from '../stores/sensor'
 
 defineProps({
   width: {
@@ -8,16 +9,23 @@ defineProps({
   },
 })
 
+const sensorStore = useSensorStore()
+
 const isClick = ref(false)
-const toggle = () => {
+const toggle = async () => {
   isClick.value = !isClick.value
+
+  // Menggunakan handlePump dari store untuk mengirimkan state
+  const state = isClick.value ? 'ON' : 'OFF'
+  await sensorStore.handlePump(state)
 }
 </script>
 
 <template>
   <section class="bg-white w-full h-full py-5 rounded-3xl">
     <div
-      class="w-[80%] h-20 mx-auto relative flex items-center p-1 rounded-full bg-green-500"
+      class="w-[80%] h-20 mx-auto relative flex items-center p-1 rounded-full"
+      :class="isClick ? 'bg-green-500' : 'bg-slate-400'"
       :style="{ width }"
       @click="toggle"
     >

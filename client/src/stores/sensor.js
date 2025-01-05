@@ -1,10 +1,12 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import axios from 'axios'
 
 export const useSensorStore = defineStore(
   'sensor',
   () => {
-    const pH = ref(4.8)
+    const BaseURL = 'http://localhost:5000/api'
+    const pH = ref(7)
 
     // Fungsi untuk menentukan warna berdasarkan nilai pH
     const pHColor = computed(() => {
@@ -14,7 +16,28 @@ export const useSensorStore = defineStore(
       if (pH.value <= 14) return pH.value <= 9 ? '#0096FF' : '#0047AB' // Hijau-Biru hingga Biru Muda
       return '#000' // Default untuk nilai tak terduga
     })
-    return { pH, pHColor }
+
+    const getpHValue = async () => {
+      try {
+        const response = await axios.get(`${BaseURL}/ph`)
+        console.log('response :', response)
+      } catch (err) {
+        console.log('error :', err)
+      }
+    }
+
+    const handlePump = async (state) => {
+      try {
+        const response = await axios.post(`${BaseURL}/relay`, {
+          state,
+        })
+
+        console.log(response.data.message)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+    return { pH, pHColor, getpHValue, handlePump }
   },
   {
     persist: true,
