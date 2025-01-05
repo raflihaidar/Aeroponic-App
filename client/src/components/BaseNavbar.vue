@@ -7,28 +7,26 @@ import SettingsIcon from './icons/SettingsIcon.vue'
 </script>
 
 <template>
-  <nav
-    class="bg-white w-[95vw] px-5 py-4 rounded-full left-1/2 bottom-3 -translate-x-1/2 h-auto text-center fixed"
-  >
+  <nav class="bg-white w-[95vw] px-5 py-4 rounded-full left-1/2 bottom-3 -translate-x-1/2 h-auto text-center fixed">
     <ul class="w-full flex justify-between text-sm">
       <li>
-        <ResetIcon />
+        <ResetIcon class="text-red-500" />
         <p class="text-xs mt-1">Reset</p>
       </li>
       <li>
-        <DownloadIcon />
+        <DownloadIcon class="text-green-500" />
         <p class="text-xs mt-1">Data</p>
       </li>
       <li>
-        <HomeIcon />
+        <HomeIcon class="text-orange-400" />
         <p class="text-xs mt-1">Home</p>
       </li>
       <li>
-        <ChartIcon />
+        <ChartIcon class="text-purple-600" />
         <p class="text-xs mt-1">Charts</p>
       </li>
       <li>
-        <SettingsIcon />
+        <SettingsIcon class="text-blue-600" />
         <p class="text-xs mt-1">Settings</p>
       </li>
     </ul>

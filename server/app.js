@@ -94,3 +94,4 @@ app.post('/api/relay', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Aeroponic app listening on port ${port}`)
+})
