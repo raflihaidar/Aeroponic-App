@@ -5,6 +5,7 @@ import { useSensorStore } from '@/stores/sensor.js'
 import { useTimerStore } from '@/stores/timer.js'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref, onUnmounted } from 'vue'
+import BaseChart from '../components/BaseChart.vue'
 
 const sensorStore = useSensorStore()
 const timerStore = useTimerStore()
@@ -39,20 +40,20 @@ function stopAutoUpdate() {
 onUnmounted(() => {
   stopAutoUpdate()
 })
-
-
 </script>
 
 <template>
-  <main class="w-full h-full mt-28 z-50">
+  <main class="w-full h-full mt-28 pb-40 z-50">
     <section class="w-[90%] mx-auto grid gap-y-10">
       <section class="flex gap-x-5">
         <!-- Menampilkan status pH -->
         <BaseCard data-name="pH Status" :icon="true" :value="pH" :color-value="pHColor" />
       </section>
 
+      <BaseChart />
       <!-- BaseToggle untuk mengontrol status pump -->
-      <BaseToggle width="60%" /> <!-- Menggunakan event @toggle untuk handle perubahan state -->
+      <BaseToggle width="60%" />
+      <!-- Menggunakan event @toggle untuk handle perubahan state -->
     </section>
   </main>
 </template>

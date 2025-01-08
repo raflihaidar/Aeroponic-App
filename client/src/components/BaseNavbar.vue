@@ -7,7 +7,9 @@ import SettingsIcon from './icons/SettingsIcon.vue'
 </script>
 
 <template>
-  <nav class="bg-white w-[95vw] px-5 py-4 rounded-full left-1/2 bottom-3 -translate-x-1/2 h-auto text-center fixed">
+  <nav
+    class="bg-white w-[95vw] px-5 py-4 rounded-full left-1/2 bottom-3 -translate-x-1/2 h-auto text-center fixed"
+  >
     <ul class="w-full flex justify-between text-sm">
       <li>
         <ResetIcon class="text-red-500" />
