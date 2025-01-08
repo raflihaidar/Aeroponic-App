@@ -2,43 +2,93 @@
 import BaseCard from '@/components/BaseCard.vue'
 import BaseToggle from '@/components/BaseToggle.vue'
 import { useSensorStore } from '@/stores/sensor.js'
-import { useTimerStore } from '@/stores/timer.js'
+// import { useTimerStore } from '@/stores/timer.js'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref, onUnmounted } from 'vue'
 import BaseChart from '../components/BaseChart.vue'
+import mqtt from 'mqtt' // Import mqtt.js
 
 const sensorStore = useSensorStore()
-const timerStore = useTimerStore()
+// const timerStore = useTimerStore()
+const wsClient = ref(null) // MQTT client
+const isConnected = ref(false) // Connection status
+const retryInterval = 3000 // Time interval for retrying connection (ms)
+let retryTimeout = null // Timeout reference for reconnection
 
 const { pH, pHColor } = storeToRefs(sensorStore)
-const { formattedTime, startTimer, stopTimer } = storeToRefs(timerStore)
+// const { formattedTime, startTimer, stopTimer } = storeToRefs(timerStore)
 
-// Fungsi untuk mengupdate pH secara periodik
-const intervalId = ref(null)
+// Function to initiate MQTT connection using WebSocket
+const connectMQTT = () => {
+  wsClient.value = mqtt.connect(
+    'wss://e1ba2dc5f46b4b46a15520b16e2bebc2.s1.eu.hivemq.cloud:8884/mqtt',
+    {
+      username: 'esp32', // Username if required
+      password: 'Esp322005', // Password if required
+    },
+  )
 
-onMounted(async () => {
-  await sensorStore.getpHValue()
-  startAutoUpdate() // Memulai pembaruan otomatis
-})
+  wsClient.value.on('connect', () => {
+    console.log('MQTT connected.')
+    isConnected.value = true
+    if (retryTimeout) {
+      clearTimeout(retryTimeout) // Clear the retry timeout on successful connection
+      retryTimeout = null
+    }
 
-// Fungsi untuk memperbarui pH setiap 5 detik
-function startAutoUpdate() {
-  intervalId.value = setInterval(async () => {
-    await sensorStore.getpHValue()
-    console.log('pH diperbarui secara otomatis')
-  }, 5000)
+    // Subscribe to topic
+    wsClient.value.subscribe('esp32/sensor/ph', (err) => {
+      if (err) {
+        console.error('Subscription error:', err)
+      } else {
+        console.log('Subscribed to esp32/sensor/ph topic')
+      }
+    })
+  })
+
+  wsClient.value.on('message', (topic, message) => {
+    // Handle incoming message
+    console.log(`Message received on topic ${topic}:`, message.toString())
+    if (topic === 'esp32/sensor/ph') {
+      // Parse the message and update the sensor store (e.g., pH value)
+      const sensorData = JSON.parse(message.toString())
+      sensorStore.setPH(sensorData.ph)
+    }
+  })
+
+  wsClient.value.on('error', (error) => {
+    console.error('MQTT error:', error)
+    isConnected.value = false
+  })
+
+  wsClient.value.on('close', () => {
+    console.log('MQTT connection closed. Retrying...')
+    isConnected.value = false
+    attemptReconnect() // Trigger reconnection process when the connection closes
+  })
 }
 
-function stopAutoUpdate() {
-  if (intervalId.value) {
-    clearInterval(intervalId.value)
-    intervalId.value = null
+// Retry connection mechanism
+const attemptReconnect = () => {
+  if (!isConnected.value) {
+    retryTimeout = setTimeout(() => {
+      console.log('Attempting to reconnect...')
+      connectMQTT()
+    }, retryInterval)
   }
 }
 
-// Bersihkan interval saat komponen dihancurkan
+onMounted(() => {
+  connectMQTT()
+})
+
 onUnmounted(() => {
-  stopAutoUpdate()
+  if (wsClient.value) {
+    wsClient.value.end() // Close the MQTT connection when component unmounts
+  }
+  if (retryTimeout) {
+    clearTimeout(retryTimeout)
+  }
 })
 </script>
 
