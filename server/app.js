@@ -3,16 +3,17 @@ import process from 'process'
 import dotenv from 'dotenv'
 import mqtt from 'mqtt'
 import cors from 'cors'
+import { options } from './src/config/mqtt.js'
 
 dotenv.config()
 
 const app = express()
-const port = process.env.APP_PORT
+const port = process.env.APP_PORT || 3000
 
 let phValue = 0
 
 // Connect to MQTT broker
-const mqttClient = mqtt.connect('mqtt://localhost:1883')
+const mqttClient = mqtt.connect(options)
 
 app.use(cors()) // Enable CORS for all routes
 app.use(express.json())
@@ -32,6 +33,7 @@ mqttClient.on('connect', () => {
   })
 })
 
+// Menerima pesan dari MQTT dan memverifikasi sebelum dikirim ke WebSocket
 mqttClient.on('message', (topic, message) => {
   if (topic === 'esp32/sensor/ph') {
     try {
