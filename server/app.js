@@ -92,6 +92,23 @@ app.post('/api/relay', (req, res) => {
   }
 })
 
+// Express route to publish MQTT messages for PH sensor
+app.post('/publish/ph', (req, res) => {
+  const { ph } = req.body
+  if (ph !== undefined) {
+    mqttClient.publish('esp32/sensor/ph', JSON.stringify({ ph }))
+    res.json({
+      statusCode: 200,
+      message: `Message with pH value "${ph}" published to esp32/sensor/ph`,
+    })
+  } else {
+    res.status(400).json({
+      statusCode: 400,
+      message: 'pH value is required.',
+    })
+  }
+})
+
 app.listen(port, () => {
   console.log(`Aeroponic app listening on port ${port}`)
 })
