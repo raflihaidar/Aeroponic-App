@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import axios from 'axios'
 
 export const useTimerStore = defineStore('timer', () => {
   const BaseURL = 'http://localhost:5000/api'
