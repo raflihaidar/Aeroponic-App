@@ -1,5 +1,12 @@
+import process from 'process'
+import dotenv from 'dotenv'
+
+dotenv.config()
+
 export const options = {
-  clientId: 'aero_' + Math.random().toString(16).substring(2, 8),
-  Username: 'ralph',
-  Password: '0dfTYEF90nAd9kNK8IEr',
+  host: process.env.HIVEMQ_HOST,
+  port: process.env.MQTT_PORT,
+  protocol: 'mqtts',
+  username: process.env.MQTT_USERNAME,
+  password: process.env.MQTT_PASSWORD,
 }
